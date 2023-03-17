@@ -1,5 +1,6 @@
 package ru.yauroff.messagesubscriber.service.impl;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import ru.yauroff.messagesubscriber.service.TelemetryService;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Data
 public class TelemetryServiceImpl implements TelemetryService {
     private final TelemetryRepository telemetryRepository;
 

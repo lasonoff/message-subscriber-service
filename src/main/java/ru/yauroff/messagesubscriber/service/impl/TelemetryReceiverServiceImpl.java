@@ -2,6 +2,7 @@ package ru.yauroff.messagesubscriber.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -15,6 +16,7 @@ import ru.yauroff.messagesubscriber.service.TelemetryService;
 
 @Service
 @RequiredArgsConstructor
+@Data
 @Slf4j
 public class TelemetryReceiverServiceImpl implements TelemetryReceiverService {
     private final ObjectMapper objectMapper;
