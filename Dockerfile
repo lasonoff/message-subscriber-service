@@ -3,6 +3,7 @@ FROM openjdk:18-jdk-alpine
 ARG KAFKA_SERVER localhost:9092
 ENV KAFKA_SERVER ${KAFKA_SERVER}
 
+# API arguments
 ARG AGENT_LOAD_URL http://127.0.0.1:8888/api/v1/agents
 ENV AGENT_LOAD_URL ${AGENT_LOAD_URL}
 
