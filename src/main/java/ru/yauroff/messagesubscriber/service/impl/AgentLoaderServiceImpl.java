@@ -27,6 +27,7 @@ public class AgentLoaderServiceImpl implements AgentLoaderService {
     @EventListener(ApplicationReadyEvent.class)
     @Override
     public Mono<Void> loadAll() {
+        log.info("Agent load url: {}", loadUrl);
         WebClient webClient = WebClient.create(loadUrl);
         webClient.get()
                  .uri("")
