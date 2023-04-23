@@ -4,5 +4,5 @@ import reactor.core.publisher.Mono;
 
 public interface AgentLoaderService {
 
-    Mono<Void> loadAll();
+    void loadAll();
 }

@@ -8,7 +8,6 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 import ru.yauroff.messagesubscriber.repository.AgentRepository;
 import ru.yauroff.messagesubscriber.service.AgentLoaderService;
 
@@ -26,7 +25,7 @@ public class AgentLoaderServiceImpl implements AgentLoaderService {
 
     @EventListener(ApplicationReadyEvent.class)
     @Override
-    public Mono<Void> loadAll() {
+    public void loadAll() {
         log.info("Agent load url: {}", loadUrl);
         WebClient webClient = WebClient.create();
 
@@ -37,6 +36,5 @@ public class AgentLoaderServiceImpl implements AgentLoaderService {
                               .bodyToMono(String.class)
                               .block();
         log.info("Responce: {}", res);
-        return null;
     }
 }
