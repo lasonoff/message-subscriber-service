@@ -4,5 +4,5 @@ import java.io.IOException;
 
 public interface AgentLoaderService {
 
-    void loadAll();
+    void loadAll() throws IOException;
 }

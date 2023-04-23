@@ -38,28 +38,7 @@ public class AgentLoaderServiceImpl implements AgentLoaderService {
 
     @EventListener(ApplicationReadyEvent.class)
     @Override
-    public void loadAll() {
-        String requestData = null;
-        try {
-            requestData = loadFromUrl();
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-        List<AgentDTO> agents = null;
-        try {
-            agents = objectMapper.readValue(requestData, new TypeReference<List<AgentDTO>>() {
-            });
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-        }
-        Flux.fromIterable(agents)
-            .map(agentDto -> agentDto.toAgent())
-            .flatMap(agent -> agentRepository.save(agent))
-            .subscribe(value -> log.info("Add agent {}", value),
-                    error -> log.error("Error {}", error.getMessage()));
-    }
-
-    private String loadFromUrl() throws IOException {
+    public void loadAll() throws IOException {
         log.info("Agent load url: {}", loadUrl);
         URL url = new URL(loadUrl);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -67,6 +46,8 @@ public class AgentLoaderServiceImpl implements AgentLoaderService {
         con.setRequestProperty("Content-Type", "application/json");
         con.setConnectTimeout(5000);
         con.setReadTimeout(5000);
+
+        int status = con.getResponseCode();
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
@@ -77,6 +58,7 @@ public class AgentLoaderServiceImpl implements AgentLoaderService {
         }
         in.close();
         con.disconnect();
-        return content.toString();
+        log.info("STATUS {}", status);
+        log.info("BODY {}", content.toString());
     }
 }
