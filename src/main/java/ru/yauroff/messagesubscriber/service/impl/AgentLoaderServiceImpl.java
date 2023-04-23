@@ -1,5 +1,6 @@
 package ru.yauroff.messagesubscriber.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
@@ -38,19 +39,19 @@ public class AgentLoaderServiceImpl implements AgentLoaderService {
     @EventListener(ApplicationReadyEvent.class)
     @Override
     public void loadAll() {
-        CompletableFuture.runAsync(() -> {
-            try {
-                loadAllRun();
-            } catch (IOException e) {
-                log.error(e.getMessage());
-            }
-        });
-    }
-
-    private void loadAllRun() throws IOException {
-        String requestData = loadFromUrl();
-        List<AgentDTO> agents = objectMapper.readValue(requestData, new TypeReference<List<AgentDTO>>() {
-        });
+        String requestData = null;
+        try {
+            requestData = loadFromUrl();
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        List<AgentDTO> agents = null;
+        try {
+            agents = objectMapper.readValue(requestData, new TypeReference<List<AgentDTO>>() {
+            });
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
         Flux.fromIterable(agents)
             .map(agentDto -> agentDto.toAgent())
             .flatMap(agent -> agentRepository.save(agent))
