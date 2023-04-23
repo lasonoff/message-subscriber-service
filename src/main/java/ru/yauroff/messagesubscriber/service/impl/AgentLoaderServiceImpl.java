@@ -9,7 +9,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import ru.yauroff.messagesubscriber.dto.AgentDTO;
 import ru.yauroff.messagesubscriber.repository.AgentRepository;
 import ru.yauroff.messagesubscriber.service.AgentLoaderService;
 
@@ -31,14 +30,13 @@ public class AgentLoaderServiceImpl implements AgentLoaderService {
         log.info("Agent load url: {}", loadUrl);
         WebClient webClient = WebClient.create();
 
-        webClient.get()
-                 .uri(loadUrl)
-                 .retrieve()
-                 .bodyToFlux(AgentDTO.class)
-                 .map(agentDto -> agentDto.toAgent())
-                 .flatMap(agent -> agentRepository.save(agent))
-                 .subscribe(value -> log.info("Add agent {}", value),
-                         error -> log.error("Error {}", error.getMessage()));
+
+        String res = webClient.get()
+                              .uri(loadUrl)
+                              .retrieve()
+                              .bodyToMono(String.class)
+                              .block();
+        log.info("Responce: {}", res);
         return null;
     }
 }
