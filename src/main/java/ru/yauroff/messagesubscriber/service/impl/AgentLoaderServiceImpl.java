@@ -20,6 +20,7 @@ import ru.yauroff.messagesubscriber.service.AgentLoaderService;
 public class AgentLoaderServiceImpl implements AgentLoaderService {
 
     private final AgentRepository agentRepository;
+    //private final WebClient webClient;
 
     @Value("${data.agent.load.url}")
     private String loadUrl;
@@ -28,14 +29,15 @@ public class AgentLoaderServiceImpl implements AgentLoaderService {
     @Override
     public Mono<Void> loadAll() {
         log.info("Agent load url: {}", loadUrl);
-        WebClient webClient = WebClient.create(loadUrl);
+        WebClient webClient = WebClient.create();
+
         webClient.get()
-                 .uri("")
+                 .uri(loadUrl)
                  .retrieve()
                  .bodyToFlux(AgentDTO.class)
                  .map(agentDto -> agentDto.toAgent())
                  .flatMap(agent -> agentRepository.save(agent))
-                 .subscribe(value -> log.info("Add agent {}", value.getAgent_id()),
+                 .subscribe(value -> log.info("Add agent {}", value),
                          error -> log.error("Error {}", error.getMessage()));
         return null;
     }
