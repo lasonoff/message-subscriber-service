@@ -58,7 +58,13 @@ public class AgentLoaderServiceImpl implements AgentLoaderService {
         }
         in.close();
         con.disconnect();
-        log.info("STATUS {}", status);
-        log.info("BODY {}", content.toString());
+        List<AgentDTO> agents = null;
+        try {
+            agents = objectMapper.readValue(content.toString(), new TypeReference<List<AgentDTO>>() {
+            });
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
+        log.info(agents.toString());
     }
 }
