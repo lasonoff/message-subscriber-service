@@ -66,5 +66,10 @@ public class AgentLoaderServiceImpl implements AgentLoaderService {
             log.error(e.getMessage());
         }
         log.info(agents.toString());
+        Flux.fromIterable(agents)
+            .map(agentDto -> agentDto.toAgent())
+            .flatMap(agent -> agentRepository.save(agent))
+            .subscribe(value -> log.info("Add agent {}", value),
+                    error -> log.error("Error {}", error.getMessage()));
     }
 }
