@@ -8,15 +8,9 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import ru.yauroff.messagesubscriber.dto.AgentDTO;
 import ru.yauroff.messagesubscriber.repository.AgentRepository;
 import ru.yauroff.messagesubscriber.service.AgentLoaderService;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 @Service
 @Data
@@ -32,28 +26,18 @@ public class AgentLoaderServiceImpl implements AgentLoaderService {
 
     @EventListener(ApplicationReadyEvent.class)
     @Override
-    public void loadAll() throws IOException {
+    public void loadAll() {
         log.info("Agent load url: {}", loadUrl);
-        URL url = new URL(loadUrl);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
-        con.setRequestProperty("Content-Type", "application/json");
-        con.setConnectTimeout(5000);
-        con.setReadTimeout(5000);
+        WebClient webClient = WebClient.create();
 
-        int status = con.getResponseCode();
-
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer content = new StringBuffer();
-        while ((inputLine = in.readLine()) != null) {
-            content.append(inputLine);
-        }
-        in.close();
-        con.disconnect();
-
-        log.info("STATUS {}", status);
-        log.info(content.toString());
+        webClient.get()
+                 .uri(loadUrl)
+                 .header("Content-Type", "application/json")
+                 .retrieve()
+                 .bodyToFlux(AgentDTO.class)
+                 .map(agentDto -> agentDto.toAgent())
+                 .flatMap(agent -> agentRepository.save(agent))
+                 .subscribe(value -> log.info("Add agent {}", value),
+                         error -> log.error("Error {}", error.getMessage()));
     }
 }
