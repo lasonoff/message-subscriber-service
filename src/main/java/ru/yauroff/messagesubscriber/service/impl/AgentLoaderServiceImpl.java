@@ -11,6 +11,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 import ru.yauroff.messagesubscriber.repository.AgentRepository;
 import ru.yauroff.messagesubscriber.service.AgentLoaderService;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 @Service
 @Data
 @RequiredArgsConstructor
@@ -25,16 +32,28 @@ public class AgentLoaderServiceImpl implements AgentLoaderService {
 
     @EventListener(ApplicationReadyEvent.class)
     @Override
-    public void loadAll() {
+    public void loadAll() throws IOException {
         log.info("Agent load url: {}", loadUrl);
-        WebClient webClient = WebClient.create();
+        URL url = new URL(loadUrl);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setConnectTimeout(5000);
+        con.setReadTimeout(5000);
 
+        int status = con.getResponseCode();
 
-        String res = webClient.get()
-                              .uri(loadUrl)
-                              .retrieve()
-                              .bodyToMono(String.class)
-                              .block();
-        log.info("Responce: {}", res);
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer content = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+        in.close();
+        con.disconnect();
+
+        log.info("STATUS {}", status);
+        log.info(content.toString());
     }
 }
