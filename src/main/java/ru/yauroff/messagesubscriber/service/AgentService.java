@@ -3,7 +3,9 @@ package ru.yauroff.messagesubscriber.service;
 import reactor.core.publisher.Mono;
 import ru.yauroff.messagesubscriber.model.Agent;
 
-public interface AgentLoaderService {
+public interface AgentService {
 
-    Mono<Agent> loadById(String id);
+    Mono<Agent> findById(String id);
+
+    Mono<Agent> save(Agent agent);
 }
