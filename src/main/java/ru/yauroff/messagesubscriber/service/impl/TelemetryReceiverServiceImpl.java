@@ -28,7 +28,6 @@ public class TelemetryReceiverServiceImpl implements TelemetryReceiverService {
     private final AgentLoaderService agentLoaderService;
 
     @Override
-    @Async
     @KafkaListener(topics = "${kafka.topic}")
     public void listener(ConsumerRecord<String, String> record) {
         log.debug("Record key: {}, value: {} ", record.key(), record.value());
