@@ -35,6 +35,15 @@ public class KafkaConsumerConfig {
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringSerializer.class);
         consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaGroupId);
+        // TODO: убрать хардкод с временными настройками
+        String USER = "kafka-user";
+        String PASS = "kafka-user";
+        String jaasTemplate = "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"%s\" password=\"%s\";";
+        String jaasCfg = String.format(jaasTemplate, USER, PASS);
+        consumerProps.put("acks", "all");
+        consumerProps.put("security.protocol", "SASL_PLAINTEXT");
+        consumerProps.put("sasl.mechanism", "SCRAM-SHA-512");
+        consumerProps.put("sasl.jaas.config", jaasCfg);
         return consumerProps;
     }
 
